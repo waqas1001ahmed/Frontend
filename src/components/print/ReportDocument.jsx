@@ -20,7 +20,7 @@ export function resolveReportOrgHeader(settings) {
   return { kind, name };
 }
 
-export default function ReportDocument({ payload, compact = false }) {
+export default function ReportDocument({ payload, compact = false, showHeader = true, showFooter = true }) {
   if (!payload) return null;
   const { report, order, patient, doctor, items, settings } = payload;
   const logo = resolveAssetUrl(settings?.lab_logo);
@@ -36,42 +36,46 @@ export default function ReportDocument({ payload, compact = false }) {
   const watermark = report.status === 'draft' ? 'DRAFT' : report.status === 'amended' ? 'AMENDED' : '';
 
   return (
-    <article className={`print-sheet report-sheet ${compact ? '' : ''}`}>
+    <article className={`print-sheet report-sheet ${compact ? '' : ''}${showHeader ? '' : ' report-sheet--no-header'}`}>
       {watermark && (
         <div className="report-watermark"><span>{watermark}</span></div>
       )}
-      <header className="report-header">
-        {orgHeader && (
-          <div className="report-org-banner">
-            <span className="report-org-kind">{orgHeader.kind}</span>
-            <span className="report-org-name">{orgHeader.name}</span>
-          </div>
-        )}
-        {settings?.report_show_logo !== false && (
-          <div className="report-logo">
-            {logo ? <img src={logo} alt="" /> : <div className="report-logo-placeholder">{(settings?.lab_name || 'LAB').slice(0, 2).toUpperCase()}</div>}
-          </div>
-        )}
-        <div className="report-lab">
-          <div className="report-lab-name">{settings?.lab_name}</div>
-          {settings?.lab_tagline && <div className="report-lab-tagline">{settings.lab_tagline}</div>}
-          <div className="report-lab-meta">
-            {settings?.lab_address && <span>{settings.lab_address}</span>}
-            {settings?.lab_phone && <span>{settings.lab_phone}</span>}
-            {settings?.lab_email && <span>{settings.lab_email}</span>}
-            {settings?.lab_license && <span>Reg. {settings.lab_license}</span>}
-          </div>
-        </div>
-        <div className="report-header-right">
-          <div className="rh-label">Report No</div>
-          <div className="rh-value">{report.report_no}</div>
-          <div className="rh-label" style={{ marginTop: 6 }}>Order No</div>
-          <div className="rh-value">{order?.order_no}</div>
-        </div>
-      </header>
+      {showHeader && (
+        <div className="report-branding-header">
+          <header className="report-header">
+            {orgHeader && (
+              <div className="report-org-banner">
+                <span className="report-org-kind">{orgHeader.kind}</span>
+                <span className="report-org-name">{orgHeader.name}</span>
+              </div>
+            )}
+            {settings?.report_show_logo !== false && (
+              <div className="report-logo">
+                {logo ? <img src={logo} alt="" /> : <div className="report-logo-placeholder">{(settings?.lab_name || 'LAB').slice(0, 2).toUpperCase()}</div>}
+              </div>
+            )}
+            <div className="report-lab">
+              <div className="report-lab-name">{settings?.lab_name}</div>
+              {settings?.lab_tagline && <div className="report-lab-tagline">{settings.lab_tagline}</div>}
+              <div className="report-lab-meta">
+                {settings?.lab_address && <span>{settings.lab_address}</span>}
+                {settings?.lab_phone && <span>{settings.lab_phone}</span>}
+                {settings?.lab_email && <span>{settings.lab_email}</span>}
+                {settings?.lab_license && <span>Reg. {settings.lab_license}</span>}
+              </div>
+            </div>
+            <div className="report-header-right">
+              <div className="rh-label">Report No</div>
+              <div className="rh-value">{report.report_no}</div>
+              <div className="rh-label" style={{ marginTop: 6 }}>Order No</div>
+              <div className="rh-value">{order?.order_no}</div>
+            </div>
+          </header>
 
-      <div className="report-title-band">{settings?.report_title || 'Laboratory Investigation Report'}</div>
-      {settings?.report_header && <p style={{ textAlign: 'center', fontSize: 10, marginTop: 6, color: '#475569' }}>{settings.report_header}</p>}
+          <div className="report-title-band">{settings?.report_title || 'Laboratory Investigation Report'}</div>
+          {settings?.report_header && <p style={{ textAlign: 'center', fontSize: 10, marginTop: 6, color: '#475569' }}>{settings.report_header}</p>}
+        </div>
+      )}
 
       <section className="report-patient">
         <div className="report-patient-col">
@@ -137,28 +141,32 @@ export default function ReportDocument({ payload, compact = false }) {
         </section>
       )}
 
-      <section className="report-signatures">
-        <div className="report-sign">
-          <div className="sign-line" />
-          <div className="sign-name">{report.created_by_name || 'Technologist'}</div>
-          <div className="sign-role">Reported by</div>
-        </div>
-        <div className="report-sign">
-          <div className="sign-line" />
-          <div className="sign-name">{report.verified_by_name || '—'}</div>
-          <div className="sign-role">Verified by</div>
-        </div>
-        <div className="report-sign">
-          <div className="sign-line" />
-          <div className="sign-name">{settings?.report_authorized_name || 'Pathologist'}</div>
-          <div className="sign-role">{settings?.report_authorized_title || 'Authorised signatory'}</div>
-        </div>
-      </section>
+      {showFooter && (
+        <div className="report-footer-block">
+          <section className="report-signatures">
+            <div className="report-sign">
+              <div className="sign-line" />
+              <div className="sign-name">{report.created_by_name || 'Technologist'}</div>
+              <div className="sign-role">Reported by</div>
+            </div>
+            <div className="report-sign">
+              <div className="sign-line" />
+              <div className="sign-name">{report.verified_by_name || '—'}</div>
+              <div className="sign-role">Verified by</div>
+            </div>
+            <div className="report-sign">
+              <div className="sign-line" />
+              <div className="sign-name">{settings?.report_authorized_name || 'Pathologist'}</div>
+              <div className="sign-role">{settings?.report_authorized_title || 'Authorised signatory'}</div>
+            </div>
+          </section>
 
-      <footer className="report-footer">
-        <div className="rf-note">{settings?.report_footer}</div>
-        <div className="rf-page">{report.report_no}</div>
-      </footer>
+          <footer className="report-footer">
+            <div className="rf-note">{settings?.report_footer}</div>
+            <div className="rf-page">{report.report_no}</div>
+          </footer>
+        </div>
+      )}
     </article>
   );
 }
