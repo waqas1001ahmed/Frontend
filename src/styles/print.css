@@ -45,6 +45,11 @@
 /* --------------------------------------------------------------------------
    A4 Laboratory report
    -------------------------------------------------------------------------- */
+@page report-page {
+  size: A4;
+  margin: 12mm 13mm 14mm;
+}
+
 .report-sheet {
   width: 210mm;
   min-height: 296mm;
@@ -54,6 +59,7 @@
   display: flex;
   flex-direction: column;
 }
+.report-sheet--no-header .report-patient { margin-top: 0; }
 
 .report-header {
   display: flex;
@@ -248,8 +254,10 @@
 }
 .report-note-box .rn-body { font-size: 10px; color: #334155; }
 
+.report-footer-block { margin-top: auto; }
+
 .report-signatures {
-  margin-top: auto;
+  margin-top: 0;
   padding-top: 22px;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -418,8 +426,9 @@
     width: auto !important;
   }
   .report-sheet {
+    page: report-page;
     width: auto;
-    min-height: 0;
+    min-height: 271mm;
     padding: 0;
   }
   .receipt-sheet { width: auto; padding: 0; }
