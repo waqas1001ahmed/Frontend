@@ -16,7 +16,10 @@ export default function PrintReceipt() {
   useEffect(() => {
     if (!data) return undefined;
     api.post(`/receipts/${id}/print`).catch(() => {});
-    return undefined;
+    const timer = setTimeout(() => {
+      try { window.print(); } catch { /* ignore */ }
+    }, 300);
+    return () => clearTimeout(timer);
   }, [data, id]);
 
   if (loading && !data) return <LoadingBlock label="Preparing receipt…" />;
