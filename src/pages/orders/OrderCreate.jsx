@@ -107,7 +107,11 @@ export default function OrderCreate() {
       if (paid > 0) payload.payment = { amount: paid, method: payMethod, reference_no: payRef || undefined };
       const { data: created } = await api.post('/orders', payload);
       toast.success('Order created', created.data.order.order_no);
-      navigate(`/orders/${created.data.order.id}`);
+      if (created.receipt_id) {
+        navigate(`/receipts/${created.receipt_id}/print`);
+      } else {
+        navigate(`/orders/${created.data.order.id}`);
+      }
     } catch (saveError) {
       setError(apiError(saveError, 'Unable to create order'));
     } finally {
